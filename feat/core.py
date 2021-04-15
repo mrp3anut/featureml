@@ -30,6 +30,7 @@ def wavelet(wl):
     else:
         cwt_ = pywt.cwt
     return cwt_
+
 def cwt(data,
         dt,
         nf=1,
