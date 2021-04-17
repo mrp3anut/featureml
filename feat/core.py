@@ -1,8 +1,8 @@
-from obspy.signal.tf_misfit import cwt as obspycwt
-import pywt 
 import numpy as np
-import matplotlib.pyplot as plt
 import scipy as sp
+import pywt 
+from obspy.signal.tf_misfit import cwt as obspycwt
+
 
 
 def wavelet(wl):
