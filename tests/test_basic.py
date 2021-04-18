@@ -1,4 +1,4 @@
-from feateml import feateml.core as ft
+from feateml import feateml.core 
 
 def test_dim():
     data = np.zeros((600,))
