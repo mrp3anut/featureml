@@ -5,7 +5,7 @@ from obspy.signal.tf_misfit import cwt as obspycwt
 
 
 
-def wavelet(wl):
+def wavelet_cwt(wl):
     """
     preparing wavelet function for transformation
     
@@ -63,7 +63,7 @@ def cwt(data,
     -------
     Continous wavelet transform applied data shape= (nf, len(data))
     """
-    cwt_ = wavelet(wl)
+    cwt_ = wavelet_cwt(wl)
     params = parameter_calc(wl=wl,dt=dt,f_min=f_min,f_max=f_max,nf=nf,w0=w0)
     return cwt_(data,**params)
     
@@ -202,7 +202,7 @@ def add_wl_ch(data,dt,f_min,f_max,nf,w0,wl):
 
 
 
-def wavelet_plt(ext_data):
+def plt_ch(ext_data):
     
     time = np.arange(0, ext_data.shape[1])
 
