@@ -1,5 +1,8 @@
+import numpy as np
+import pywt 
 from numpy.testing import (assert_allclose, assert_equal)
-import feateml 
+from feat.core import cwt 
+
 
 
 

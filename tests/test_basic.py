@@ -1,4 +1,6 @@
-from feateml import feateml.core 
+import numpy as np
+from feat.core import cwt
+
 
 def test_dim():
     data = np.zeros((600,))

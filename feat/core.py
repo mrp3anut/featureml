@@ -33,11 +33,11 @@ def wavelet(wl):
 
 def cwt(data,
         dt,
-        nf=1,
-        f_min=1,
-        f_max=50,
-        wl ='morlet' ,
-        w0=5):
+         nf=1,
+      f_min=1,
+      f_max=50,
+        wl ='morlet',
+         w0=5):
     """
     Continous Wavelet Transform
     
@@ -65,7 +65,8 @@ def cwt(data,
     """
     cwt_ = wavelet(wl)
     params = parameter_calc(wl,dt,f_min,f_max,nf,w0)
-    return cwt_(data,*params)
+    return cwt_(data,**params)
+    
     
 def dt_to_widths(dt,f_min,f_max,nf,w0):
     """
@@ -122,15 +123,15 @@ def parameter_calc(wl,dt,f_min,f_max,nf,w0):
     """
     if wl == 'ricker':
         widths = dt_to_widths(dt,f_min,f_max,nf,w0)
-        params = [sp.signal.ricker,widths]
+        params = {'wavelet':sp.signal.ricker,'widths':widths}
        
     elif wl =='morlet':
-        params = [dt,w0,f_min,f_max,nf]
-        
+        params = {'dt':dt,'w0':w0,'fmin':f_min,'fmax':f_max,'nf':nf}        
     else:
         widths = dt_to_widths(dt,f_min,f_max,nf,w0)
-        params = [widths,wl]
+        params = {'scales':widths,'wavelet':wl}
     return params
+
 
 def print_wavelets():
     """"

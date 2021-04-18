@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name="feateml",
+    name="featureml",
     author="khdoex,mrp3anut,kutayisgorur",
    
     
