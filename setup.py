@@ -15,8 +15,7 @@ setup(
    'scipy',
    'PyWavelets',
    'obspy',
-	 'jupyter'], 
+   'jupyter'], 
 
-    python_requires='>=3.6',
-)
+   )
 
