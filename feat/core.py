@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import scipy as sp
 import pywt 
 from obspy.signal.tf_misfit import cwt as obspycwt
