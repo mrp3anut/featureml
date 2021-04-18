@@ -1,3 +1,7 @@
+from numpy.testing import (assert_allclose, assert_equal)
+import feateml 
+
+
 
 def test_cwt_advanced(tol=1e-7):
     time, sst = pywt.data.nino()
