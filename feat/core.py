@@ -72,7 +72,6 @@ def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
     data = shaper(data)
     params = parameter_calc(wl=wl, dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0)
     ch_number = data.shape[1] 
-    length = data.shape[0]
     cwt_ = wavelet_cwt(wl)
     
    
