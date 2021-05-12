@@ -24,7 +24,7 @@ def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
     f_max: int , default=50
         Maximum frequency for transformation
     wl: str, default = morlet
-        Wavelet to use, ex: morlet, ricker,
+        Wavelet to use, ex: 'morlet', 'ricker'
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
     
@@ -35,17 +35,17 @@ def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
     """ 
     if data.ndim == 1:
         
-        cwt_data = cwt(data=data,dt=dt,f_min=f_min,f_max=f_max,nf=nf,w0=w0,wl=wl)
+        cwt_data = cwt(data=data, dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0, wl=wl)
         extended_data = add_1ch(data=data,cwt_data=cwt_data)
     elif data.ndim == 2:
-        cwt_data = multi_cwt(data=data,dt=dt,f_min=f_min,f_max=f_max,nf=nf,w0=w0,wl=wl)
+        cwt_data = multi_cwt(data=data, dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0, wl=wl)
         extended_data = add_multich(data=data, m_cwt=cwt_data)
         
     return extended_data
     
     
 
-def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
+def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
     """
     Continous Wavelet Transform
     
@@ -63,7 +63,7 @@ def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
     f_max: int , default=50
         Maximum frequency for transformation
     wl: str, default = morlet
-        Wavelet to use, ex: morlet, ricker,
+        Wavelet to use, ex: 'morlet', 'ricker'
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
     
@@ -72,12 +72,12 @@ def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
     Continous wavelet transform applied data shape= (nf, len(data))
     """
     cwt_ = wavelet_cwt(wl)
-    params = parameter_calc(wl=wl,dt=dt,f_min=f_min,f_max=f_max,nf=nf,w0=w0)
-    return cwt_(data,**params)
+    params = parameter_calc(wl=wl, dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0)
+    return cwt_(data, **params)
     
 
 
-def multi_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
+def multi_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
     """
     Continous Wavelet Transform with multichannel data 
     
@@ -95,7 +95,7 @@ def multi_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
     f_max: int , default=50
         Maximum frequency for transformation
     wl: str, default = morlet
-        Wavelet to use, ex: morlet, ricker,
+        Wavelet to use, ex: 'morlet', 'ricker'
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
     
@@ -113,18 +113,18 @@ def multi_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
     
     cwt_list = []
     for ch in range(ch_number):
-        ch_data = data[:,ch]
-        cwt_op = cwt(ch_data,dt=dt,f_min=f_min,f_max=f_max,nf=nf,w0=w0,wl=wl)
+        ch_data = data[:, ch]
+        cwt_op = cwt(ch_data, dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0, wl=wl)
         cwt_list.append(cwt_op)
         
     cwt_ = np.asarray(cwt_list)
-    cwt_ = np.reshape(cwt_, (length,ch_number*nf))
+    cwt_ = np.reshape(cwt_, (length, ch_number*nf))
     return cwt_
 
 
 
 
-def add_multich(data,m_cwt):
+def add_multich(data, m_cwt):
     """"
     Adds cwt data to data with multi channel
     
@@ -179,7 +179,7 @@ def shaper(data):
 
     data = np.asarray(data)
     if data.ndim == 1:
-        data = np.reshape(data, (len(data),1))
+        data = np.reshape(data, (len(data), 1))
     elif data.ndim == 2:
         if data.shape[0] < data.shape[1]:
             data = np.reshape(data, (data.shape[1], data.shape[0]))
@@ -197,7 +197,7 @@ def wavelet_cwt(wl):
     Parameters
     ----------
 
-    wl: str, default = morlet
+    wl: str, default = 'morlet'
         to see options, call print_wavelets() functions 
 
     
@@ -218,7 +218,7 @@ def wavelet_cwt(wl):
 
 
     
-def dt_to_widths(dt,f_min,f_max,nf,w0):
+def dt_to_widths(dt, f_min, f_max, nf, w0):
     """
     Widths calculator
     
@@ -233,7 +233,7 @@ def dt_to_widths(dt,f_min,f_max,nf,w0):
     f_max: int , default=50
         Maximum frequency for transformation
     wl: str, default = morlet
-        Wavelet to use, ex: morlet, ricker,
+        Wavelet to use, ex: 'morlet', 'ricker'
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
     
@@ -248,7 +248,7 @@ def dt_to_widths(dt,f_min,f_max,nf,w0):
 
 
 
-def parameter_calc(wl,dt,f_min,f_max,nf,w0):
+def parameter_calc(wl, dt, f_min, f_max, nf, w0):
     """
     Parameter Calculator for different wavelet functions
     
@@ -263,7 +263,7 @@ def parameter_calc(wl,dt,f_min,f_max,nf,w0):
     f_max: int , default=50
         Maximum frequency for transformation
     wl: str, default = morlet
-        Wavelet to use, ex: morlet, ricker,
+        Wavelet to use, ex: 'morlet', 'ricker'
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
     
@@ -272,14 +272,14 @@ def parameter_calc(wl,dt,f_min,f_max,nf,w0):
     Parameters as list : params
     """
     if wl == 'ricker':
-        widths = dt_to_widths(dt=dt,f_min=f_min,f_max=f_max,nf=nf,w0=w0)
+        widths = dt_to_widths(dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0)
         params = {'wavelet':sp.signal.ricker,'widths':widths}
        
     elif wl =='morlet':
-        params = {'dt':dt,'w0':w0,'fmin':f_min,'fmax':f_max,'nf':nf}        
+        params = {'dt':dt, 'w0':w0, 'fmin':f_min, 'fmax':f_max, 'nf':nf}        
     else:
-        widths = dt_to_widths(dt=dt,f_min=f_min,f_max=f_max,nf=nf,w0=w0)
-        params = {'scales':widths,'wavelet':wl}
+        widths = dt_to_widths(dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0)
+        params = {'scales':widths, 'wavelet':wl}
     return params
 
 
