@@ -57,7 +57,7 @@ def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
     f_max: int , default=50
         Maximum frequency for transformation
     wl: str, default = morlet
-        Wavelet to use, ex: morlet, ricker,
+        Wavelet to use, ex: 'morlet', 'ricker'
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
     
