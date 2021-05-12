@@ -25,7 +25,7 @@ def test_cwt_shape():
     w0 =5
     assert cwt(data = data, dt=dt,nf=nf,f_min=f_min,f_max=f_max,wl=wl).shape == (600,2)
     
-def test_featurize_cwt():
+def test_featurize_cwt_shape():
     
     data = np.zeros((600,))
     dt = 0.01
