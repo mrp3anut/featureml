@@ -147,13 +147,13 @@ def wavelet_cwt(wl):
     """
 
     if wl =='morlet':
-        cwt_ = obspycwt
+        cwt_ = obspycwt         #obspy has only morlet wavelet for cwt
     
-    elif wl=='ricker':
-        cwt_ = sp.signal.cwt
+    elif wl=='ricker' or wl=='morlet_s':       
+        cwt_ = sp.signal.cwt    #scipy has ricker and morlet wavelet that works on cwt
         
     else:
-        cwt_ = pywt.cwt
+        cwt_ = pywt.cwt         #all pywt wavelets can be seen with print_wavelets() function from utils
     return cwt_
 
 
@@ -214,7 +214,9 @@ def parameter_calc(wl, dt, f_min, f_max, nf, w0):
     if wl == 'ricker':
         widths = dt_to_widths(dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0)
         params = {'wavelet':sp.signal.ricker,'widths':widths}
-       
+    elif wl == 'morlet_s':
+        widths = dt_to_widths(dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0)
+        params = {'wavelet':sp.signal.morlet2,'widths':widths,'w':0}
     elif wl =='morlet':
         params = {'dt':dt, 'w0':w0, 'fmin':f_min, 'fmax':f_max, 'nf':nf}        
     else:

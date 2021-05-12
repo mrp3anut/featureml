@@ -1,7 +1,7 @@
 import numpy as np
 import pywt 
 from numpy.testing import (assert_allclose, assert_equal)
-from feat.core import cwt, feautirize_cwt
+from feat.core import cwt, featurize_cwt
 
 
 def test_cwt_dim():
@@ -41,37 +41,38 @@ def test_featurize_cwt_shape():
 def test_cwt_advanced(tol=1e-7):
     time, sst = pywt.data.nino()  
     # Nino is a small sea surface temperature dataset
-    sst = np.asarray(sst)
+    data = np.asarray(sst)
     dt = time[1] - time[0] #dt is time difference between two samples
     
-    wavelet = 'morlet'
+    wl = 'morlet'
     f_min=1
     f_max=10
     nf=1
     w0=5
     
-    cfs  = np.reshape(cwt(data = data, dt=dt,nf=nf,f_min=f_min,f_max=f_max,wl=wl,w0=w0),(264))  # We take cwt of the dataset, 
-    										         #then change its dimention from (264,1) to (264,)
+    cfs  = cwt(data = data, dt=dt,nf=nf,f_min=f_min,f_max=f_max,wl=wl,w0=w0)  # We take cwt of the dataset, 
+    										        
     assert_equal(cfs.real.dtype, sst.dtype)  
 
     sst_complex = sst + 1j*sst                 #We create a new complex data
-    cfs_complex,  = cwt(sst_complex, wl=wavelet,f_min=f_min,f_max=f_max,dt=dt) #Then we take cwt again on complex data 
+    cfs_complex = cwt(sst_complex, wl=wl,f_min=f_min,f_max=f_max,dt=dt) #Then we take cwt again on complex data 
     
     
     assert_allclose(cfs + 1j*cfs, cfs_complex, atol=tol, rtol=tol) #complex valued transform equals to sum of 
-    								                               #the transforms of the real and imaginary components
+    								     #the transforms of the real and imaginary components
 
 
 def test_featurize_advanced(tol=1e-7):
     time, sst = pywt.data.nino()  
     # Nino is a small sea surface temperature dataset
-    sst = np.asarray(sst)
+    data = np.asarray(sst)
     dt = time[1] - time[0] #dt is time difference between two samples
     
-    wavelet = 'morlet'
+    wl = 'morlet'
     f_min=1
     f_max=10
     nf=1
     w0=5
-    extended = featurize_cwt(data=sst, dt=dt,nf=nf,f_min=f_min,f_max=f_max,wl=wl,w0=w0)
-    assert sst == extended[:,0]
+    extended = featurize_cwt(data=data, dt=dt,nf=nf,f_min=f_min,f_max=f_max,wl=wl,w0=w0)
+    assert_allclose(sst, extended[:,0],atol=tol, rtol=tol) #check that first channel of the extended data equals to original data
+    							     

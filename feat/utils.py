@@ -27,5 +27,5 @@ def print_wavelets():
     Prints available wavelets
     
     """
-    wavlist = ['morlet', 'ricker'] + pywt.wavelist(kind='continuous')
+    wavlist = ['morlet', 'ricker','morlet_s'] + pywt.wavelist(kind='continuous')
     print(wavlist)
