@@ -6,7 +6,7 @@ from obspy.signal.tf_misfit import cwt as obspycwt
 
 
 
-def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
+def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
     """
     Applies CWT to data and then adds the result to the original data
     
@@ -40,7 +40,7 @@ def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
     
     
 
-def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
+def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
     """
     Continous Wavelet Transform with 1d and 2d data 
     
@@ -65,24 +65,24 @@ def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
 
     Returns
     -------
-    Continous wavelet transform applied data shape= (len(data),ch_number*nf)  
+    Continous wavelet transform applied data shape= (len(data), ch_number*nf)  
     
     
     ch_number: number of channels that data contains
     """
     data = shaper(data)
-    params = parameter_calc(wl=wl,dt=dt,f_min=f_min,f_max=f_max,nf=nf,w0=w0)
+    params = parameter_calc(wl=wl, dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0)
     ch_number = data.shape[1] 
     length = data.shape[0]
     cwt_ = wavelet_cwt(wl)
     
    
-    cwts = np.vstack([cwt_(data[:,ch],**params) for ch in range(ch_number)])  
+    cwts = np.vstack([cwt_(data[:, ch], **params) for ch in range(ch_number)])  
    
     return cwts.T
 
 
-def add_ch(data,m_cwt):
+def add_ch(data, m_cwt):
     """"
     Adds cwt data to data with multi channel
     Parameters
