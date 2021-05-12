@@ -23,7 +23,7 @@ def test_cwt_shape():
     f_max = 2
     wl = 'morlet'
     w0 =5
-    assert cwt(data = data, dt=dt,nf=nf,f_min=f_min,f_max=f_max,wl=wl).shape == (2,600)
+    assert cwt(data = data, dt=dt,nf=nf,f_min=f_min,f_max=f_max,wl=wl).shape == (600,2)
     
 def test_featurize_cwt():
     
@@ -34,7 +34,7 @@ def test_featurize_cwt():
     f_max = 2
     wl = 'morlet'
     w0 =5
-    featutize_cwt(data = data, dt=dt,nf=nf,f_min=f_min,f_max=f_max,wl=wl,w0=w0)
+    assert featutize_cwt(data = data, dt=dt,nf=nf,f_min=f_min,f_max=f_max,wl=wl,w0=w0).shape == (600,3) 
     
     
 
@@ -55,10 +55,10 @@ def test_cwt_advanced(tol=1e-7):
     assert_equal(cfs.real.dtype, sst.dtype)  
 
     sst_complex = sst + 1j*sst                 #We create a new complex data
-    cfs_complex,  = cwt(sst_complex, wl=wavelet,f_min=f_min,f_max=f_max,dt=dt) #Then we take cwt again on new data that gives us  complex valued transform
+    cfs_complex,  = cwt(sst_complex, wl=wavelet,f_min=f_min,f_max=f_max,dt=dt) #Then we take cwt again on complex data 
     
     
     assert_allclose(cfs + 1j*cfs, cfs_complex, atol=tol, rtol=tol) #complex valued transform equals to sum of 
-    								     #the transforms of the real and imaginary components
+    								                               #the transforms of the real and imaginary components
 
 
