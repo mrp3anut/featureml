@@ -15,9 +15,9 @@ def test_cwt_advanced(tol=1e-7):
     f_max=10
 
     
-    cfs  = np.reshape(cwt(sst, wl=wavelet,f_min=f_min,f_max=f_max,dt=dt),(264,))
+    cfs  = np.reshape(cwt(sst, wl=wavelet, f_min=f_min, f_max=f_max, dt=dt),(264,))
     assert_equal(cfs.real.dtype, sst.dtype)
 
     sst_complex = sst + 1j*sst
-    cfs_complex,  = cwt(sst_complex, wl=wavelet,f_min=f_min,f_max=f_max,dt=dt)
+    cfs_complex,  = cwt(sst_complex, wl=wavelet, f_min=f_min, f_max=f_max, dt=dt)
     assert_allclose(cfs + 1j*cfs, cfs_complex, atol=tol, rtol=tol)
