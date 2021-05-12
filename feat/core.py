@@ -41,7 +41,7 @@ def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
 
 def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
     """
-    Continous Wavelet Transform with 1d and 2d data 
+    Continous Wavelet Transform with 1D and 2D data 
     
     Parameters
     ------
@@ -103,8 +103,8 @@ def add_ch(data, m_cwt):
 
 def shaper(data):
     """
-    arranges the shape of the input data into the form of (len(data), ch_number)
-    if data is 1d then output is (len(data), 1))
+    Arranges the shape of the input data into the form of (len(data), ch_number)
+    If data is 1D then output is (len(data), 1))
 
     
     Parameters
@@ -114,7 +114,7 @@ def shaper(data):
     
     Returns
     -------
-    2D array , in the shape of (len(data), ch_number)
+    2D array, in the shape of (len(data), ch_number)
     
     """
     data = np.asarray(data)
@@ -124,7 +124,7 @@ def shaper(data):
         if data.shape[0] < data.shape[1]:
             data = data.T
     else:
-        raise Exception("This function only works with 1d and 2d data")
+        raise Exception("This function only works with 1D and 2D data")
     return data
 
 
