@@ -34,7 +34,7 @@ def test_featurize_cwt_shape():
     f_max = 2
     wl = 'morlet'
     w0 =5
-    assert featutize_cwt(data = data, dt=dt,nf=nf,f_min=f_min,f_max=f_max,wl=wl,w0=w0).shape == (600,3) 
+    assert featurize_cwt(data = data, dt=dt,nf=nf,f_min=f_min,f_max=f_max,wl=wl,w0=w0).shape == (600,3) 
     
     
 
@@ -62,3 +62,16 @@ def test_cwt_advanced(tol=1e-7):
     								                               #the transforms of the real and imaginary components
 
 
+def test_featurize_advanced(tol=1e-7):
+    time, sst = pywt.data.nino()  
+    # Nino is a small sea surface temperature dataset
+    sst = np.asarray(sst)
+    dt = time[1] - time[0] #dt is time difference between two samples
+    
+    wavelet = 'morlet'
+    f_min=1
+    f_max=10
+    nf=1
+    w0=5
+    extended = featurize_cwt(data=sst, dt=dt,nf=nf,f_min=f_min,f_max=f_max,wl=wl,w0=w0)
+    assert sst == extended[:,0]
