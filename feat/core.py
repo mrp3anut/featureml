@@ -125,7 +125,7 @@ def multi_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
 
 
 def add_multich(data, m_cwt):
-    """"
+    """
     Adds cwt data to data with multi channel
     
     Parameters
@@ -146,7 +146,7 @@ def add_multich(data, m_cwt):
 
 
 def add_1ch(data, cwt_data):
-    """"
+    """
     Adds cwt data to data with 1 channel
     
     Parameters
@@ -281,30 +281,3 @@ def parameter_calc(wl, dt, f_min, f_max, nf, w0):
         widths = dt_to_widths(dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0)
         params = {'scales':widths, 'wavelet':wl}
     return params
-
-
-    
-
-
-
-
-
-
-
-
-def plt_ch(ext_data):
-    
-    time = np.arange(0, ext_data.shape[1])
-
-    for i in range(ext_data.shape[0]):
-        plt.plot(time, ext_data[i])
-        plt.show()
-        
- 
-def print_wavelets():
-    """"
-    Prints available wavelets
-    
-    """
-    wavlist = ['morlet', 'ricker'] + pywt.wavelist(kind='continuous')
-    print(wavlist)
