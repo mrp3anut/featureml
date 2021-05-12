@@ -6,13 +6,7 @@ from obspy.signal.tf_misfit import cwt as obspycwt
 
 
 
-def featurize_cwt(data,
-                  dt,
-                  nf=1,
-               f_min=1,
-               f_max=50,
-                 wl ='morlet',
-                 w0 = 5 ):
+def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
     """
     Applies CWT to data and then adds the result to the original data
     
@@ -51,13 +45,7 @@ def featurize_cwt(data,
     
     
 
-def cwt(data,
-        dt,
-         nf=1,
-      f_min=1,
-      f_max=50,
-        wl ='morlet',
-         w0=5):
+def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
     """
     Continous Wavelet Transform
     
@@ -89,13 +77,7 @@ def cwt(data,
     
 
 
-def multi_cwt(data,
-              dt,
-              nf=1,
-           f_min=1,
-           f_max=50,
-             wl ='morlet',
-             w0=5):
+def multi_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet',w0=5):
     """
     Continous Wavelet Transform with multichannel data 
     
@@ -120,24 +102,24 @@ def multi_cwt(data,
 
     Returns
     -------
-    Continous wavelet transform applied data shape= (ch_number*nf, len(data))  
+    Continous wavelet transform applied data shape= (len(data),ch_number*nf)  
     
     
     ch_number: number of channels that data contains
     """
-    
-    ch_number= data.shape[0]
-    
-    length = data.shape[1]
+    data = shaper(data)
+    ch_number= data.shape[1]
+    length = data.shape[0]
     
     cwt_list = []
     for ch in range(ch_number):
-        ch_data = data[ch]
+        ch_data = data[:,ch]
         cwt_op = cwt(ch_data,dt=dt,f_min=f_min,f_max=f_max,nf=nf,w0=w0,wl=wl)
         cwt_list.append(cwt_op)
-    m_cwt = np.asarray(cwt_list)
-    m_cwt = np.resize(m_cwt, (ch_number*nf, length))
-    return m_cwt
+        
+    cwt_ = np.asarray(cwt_list)
+    cwt_ = np.reshape(cwt_, (length,ch_number*nf))
+    return cwt_
 
 
 
@@ -192,6 +174,21 @@ def add_1ch(data, cwt_data):
     ext_data[:ch, :] = data
     ext_data[ch:, :] = cwt_data
     return ext_data
+
+def shaper(data):
+
+    data = np.asarray(data)
+    if data.ndim == 1:
+        data = np.reshape(data, (len(data),1))
+    elif data.ndim == 2:
+        if data.shape[0] < data.shape[1]:
+            data = np.reshape(data, (data.shape[1], data.shape[0]))
+    else:
+        raise Exception("This function only works with 1d and 2d data")
+    return data
+
+
+
 
 def wavelet_cwt(wl):
     """
