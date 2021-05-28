@@ -5,14 +5,14 @@ from obspy.signal.tf_misfit import cwt as obspycwt
 
 
 
-def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
+def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=None):
     """
     Applies CWT to data and then adds the result to the original data
     
     Parameters
     ------
     data: 1D or 2D Array
-        data to transform
+        Data to transform
     
     dt: float
         Sample distance in seconds
@@ -29,7 +29,7 @@ def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
     
     Returns
     -------
-    Extended data with CWT, with shape = (len(data, ch_number + ch_number*nf))  
+    Extended data with CWT, with shape = (len(data, num_channels + num_channels*nf))  
     """ 
 
     cwt_data = cwt(data=data, dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0, wl=wl)
@@ -39,14 +39,14 @@ def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
     
     
 
-def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
+def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=None):
     """
     Continous Wavelet Transform with 1D and 2D data 
     
     Parameters
     ------
-    data: 2D Array  with shape (ch_number, len(data))
-        data to transform
+    data: 1D or 2D Array  with shape (num_channels, len(data))
+        Data to transform
     
     dt: float
         Sample distance in seconds
@@ -64,18 +64,19 @@ def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=5):
 
     Returns
     -------
-    Continous wavelet transform applied data shape= (len(data), ch_number*nf)  
+    Continous wavelet transform applied data shape= (len(data), num_channels*nf)  
     
     
-    ch_number: number of channels that data contains
+    num_channels: Number of channels that data contains
     """
-    data = shaper(data)
+    data = _shaper(data)
     params = parameter_calc(wl=wl, dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0)
-    ch_number = data.shape[1] 
+    num_channels = data.shape[1] 
     cwt_ = wavelet_cwt(wl)
-    
-   
-    cwts = np.vstack([cwt_(data[:, ch], **params) for ch in range(ch_number)])  
+    if cwt_ == pywt.cwt:
+        cwts = np.vstack([cwt_(data[:, ch], **params)[0] for ch in range(num_channels])  
+    else:
+        cwts = np.vstack([cwt_(data[:, ch], **params) for ch in range(num_channels)])  
    
     return cwts.T
 
@@ -93,7 +94,7 @@ def add_ch(data, m_cwt):
     -------
     2D array data = (len(data), ch*(1+nf))
     """
-    data = shaper(data)
+    data = _shaper(data)
     ext_data = np.concatenate((data, m_cwt), axis=1)
     return ext_data
 
@@ -101,11 +102,9 @@ def add_ch(data, m_cwt):
 
 
 
-def shaper(data):
+def _shaper(data):
     """
-    Arranges the shape of the input data into the form of (len(data), ch_number)
-    If data is 1D then output is (len(data), 1))
-
+    Checks the shape and dimension of the data. If data is 1d transforms it to 2d 
     
     Parameters
     ----------
@@ -114,17 +113,16 @@ def shaper(data):
     
     Returns
     -------
-    2D array, in the shape of (len(data), ch_number)
+    2D array, in the shape of (len(data), num_channels)
     
     """
     data = np.asarray(data)
     if data.ndim == 1:
         data = np.reshape(data, (len(data), 1))
     elif data.ndim == 2:
-        if data.shape[0] < data.shape[1]:
-            data = data.T
+        assert data.shape[0] > data.shape[1]
     else:
-        raise Exception("This function only works with 1D and 2D data")
+        raise ValueError("This function only works with 1D and 2D data")
     return data
 
 
@@ -138,7 +136,7 @@ def wavelet_cwt(wl):
     ----------
 
     wl: str, default = 'morlet'
-        to see options, call print_wavelets() functions 
+        to see options, call list_wavelets() function
 
     
     Returns
@@ -147,18 +145,18 @@ def wavelet_cwt(wl):
     """
 
     if wl =='morlet':
-        cwt_ = obspycwt         #obspy has only morlet wavelet for cwt
+        cwt_ = obspycwt         # Obspy has only morlet wavelet for cwt
     
     elif wl=='ricker' or wl=='morlet_s':       
-        cwt_ = sp.signal.cwt    #scipy has ricker and morlet wavelet that works on cwt
+        cwt_ = sp.signal.cwt    # Scipy has ricker and morlet wavelet that works on cwt
         
     else:
-        cwt_ = pywt.cwt         #all pywt wavelets can be seen with print_wavelets() function from utils
+        cwt_ = pywt.cwt         # All pywt wavelets can be seen with print_wavelets() function from utils
     return cwt_
 
 
     
-def dt_to_widths(dt, f_min, f_max, nf, w0):
+def dt_to_widths(dt, f_min, f_max, nf, wl, w0):
     """
     Widths calculator
     
@@ -172,7 +170,7 @@ def dt_to_widths(dt, f_min, f_max, nf, w0):
         Minimum frequency for transformation
     f_max: int , default=50
         Maximum frequency for transformation
-    wl: str, default = morlet
+    wl: str, default = 'morlet'
         Wavelet to use, ex: 'morlet', 'ricker'
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
@@ -181,9 +179,13 @@ def dt_to_widths(dt, f_min, f_max, nf, w0):
     -------
     Widths to use
     """
-    fs = 1/dt
+    sampling_freq = 1/dt
     freq = np.logspace(np.log10(f_min), np.log10(f_max), nf)
-    widths = w0*fs / (2*freq*np.pi)
+    if wl == 'ricker' or 'mexh':
+    	widths = 1/(4*freq)
+
+    else:
+    	widths = w0*sampling_freq / (2*freq*np.pi)
     return widths
 
 
@@ -200,7 +202,7 @@ def parameter_calc(wl, dt, f_min, f_max, nf, w0):
         Number of logarithmically spaced frequencies between fmin and fmax
     f_min: int, default=1
         Minimum frequency for transformation
-    f_max: int , default=50
+    f_max: int , default = 50
         Maximum frequency for transformation
     wl: str, default = morlet
         Wavelet to use, ex: 'morlet', 'ricker'
@@ -211,15 +213,20 @@ def parameter_calc(wl, dt, f_min, f_max, nf, w0):
     -------
     Parameters as list : params
     """
-    if wl == 'ricker':
-        widths = dt_to_widths(dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0)
+    if wl == 'ricker':									# Scipy				
+        assert w0 == None
+        widths = dt_to_widths(dt=dt, f_min=f_min, f_max=f_max, nf=nf, wl=wl, w0=w0)
         params = {'wavelet':sp.signal.ricker,'widths':widths}
-    elif wl == 'morlet_s':
+    elif wl == 'mexh':									# Pywt
+        assert w0 == None
+        scales = dt_to_widths(dt=dt, f_min=f_min, f_max=f_max, nf=nf, wl=wl, w0=w0)
+        params = {'scales':widths, 'wavelet':wl}
+    elif wl == 'morlet_s':								# Scipy			
         widths = dt_to_widths(dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0)
-        params = {'wavelet':sp.signal.morlet2,'widths':widths,'w':0}
-    elif wl =='morlet':
+        params = {'wavelet':sp.signal.morlet2,'widths':widths,'w0':w0}
+    elif wl =='morlet':								# Obspy
         params = {'dt':dt, 'w0':w0, 'fmin':f_min, 'fmax':f_max, 'nf':nf}        
     else:
-        widths = dt_to_widths(dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0)
-        params = {'scales':widths, 'wavelet':wl}
+        widths = dt_to_widths(dt=dt, f_min=f_min, f_max=f_max, nf=nf,wl=wl, w0=w0)
+        params = {'scales':widths, 'wavelet':wl}					# Pywt
     return params
