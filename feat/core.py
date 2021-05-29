@@ -18,13 +18,13 @@ def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=None):
         Sample distance in seconds
     nf: int
         Number of logarithmically spaced frequencies between fmin and fmax
-    f_min: int, default=1
+    f_min: int, default = 1
         Minimum frequency for transformation
-    f_max: int , default=50
+    f_max: int, default = 50
         Maximum frequency for transformation
     wl: str, default = morlet
         Wavelet to use, ex: 'morlet', 'ricker'
-    w0: int, default = 5
+    w0: int, default = None
         parameter for the wavelet, tradeoff between time and frequency resolution
     
     Returns
@@ -52,13 +52,13 @@ def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=None):
         Sample distance in seconds
     nf: int
         Number of logarithmically spaced frequencies between fmin and fmax
-    f_min: int, default=1
+    f_min: int, default = 1
         Minimum frequency for transformation
-    f_max: int , default=50
+    f_max: int , default = 50
         Maximum frequency for transformation
     wl: str, default = morlet
         Wavelet to use, ex: 'morlet', 'ricker'
-    w0: int, default = 5
+    w0: int, default = None
         parameter for the wavelet, tradeoff between time and frequency resolution
     
 
@@ -87,9 +87,9 @@ def add_ch(data, m_cwt):
     Parameters
     ----------
     data : 2D array
-           data used in transform
+           Data used in transform
     cwt_data : 2D array
-               continous wavelet transform of the data
+           Continous wavelet transform of the data
     Returns
     -------
     2D array data = (len(data), ch*(1+nf))
@@ -158,7 +158,7 @@ def wavelet_cwt(wl):
     
 def dt_to_widths(dt, f_min, f_max, nf, wl, w0):
     """
-    Widths calculator
+    Widths calculator for morlet and ricker wavelet 
     
     Parameters
     ----------
@@ -166,9 +166,9 @@ def dt_to_widths(dt, f_min, f_max, nf, wl, w0):
         Sample distance in seconds
     nf: int
         Number of logarithmically spaced frequencies between fmin and fmax
-    f_min: int, default=1
+    f_min: int, default = 1
         Minimum frequency for transformation
-    f_max: int , default=50
+    f_max: int , default = 50
         Maximum frequency for transformation
     wl: str, default = 'morlet'
         Wavelet to use, ex: 'morlet', 'ricker'
@@ -205,7 +205,7 @@ def parameter_calc(wl, dt, f_min, f_max, nf, w0):
     f_max: int , default = 50
         Maximum frequency for transformation
     wl: str, default = morlet
-        Wavelet to use, ex: 'morlet', 'ricker'
+        Wavelet to use, ex: 'morlet', 'ricker' ,'morlet_s', 'morl', 'mexh' ...
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
     
