@@ -25,8 +25,8 @@ def featurize_cwt(data, dt, nf=None, f_min=None, f_max=None, wl='morlet', w0=Non
         Minimum frequency for transformation
     f_max: int, default = None
         Maximum frequency for transformation
-    wl: str, default = morlet
-        Wavelet to use, ex: 'morlet', 'ricker'
+    wl: str, default = 'morlet'
+        Wavelet to use, Obspy, Scipy, and Pywt wavelets. Use list_wavelets() to see options.
     w0: int, default = None
         Parameter for the wavelet, tradeoff between time and frequency resolution
     widths: array_like, default = None
@@ -68,8 +68,8 @@ def cwt(data, dt, nf=None, f_min=None, f_max=None, wl='morlet', w0=None, widths=
         Minimum frequency for transformation
     f_max: int , default = None
         Maximum frequency for transformation
-    wl: str, default = morlet
-        Wavelet to use, ex: 'morlet', 'ricker'
+    wl: str, default = 'morlet'
+        Wavelet to use, Obspy, Scipy, and Pywt wavelets. Use list_wavelets() to see options.
     w0: int, default = None
         Parameter for the wavelet, tradeoff between time and frequency resolution
     widths: array_like, default = None
@@ -104,7 +104,7 @@ def add_ch(data, m_cwt):
     Adds cwt data to data with multi channel
     Parameters
     ----------
-    data : 2D array
+    data : 1D or 2D array
            Data used in transform
     cwt_data : 2D array
            Continous wavelet transform of the data
@@ -191,7 +191,7 @@ def _widths_calc(dt, f_min, f_max, nf, wl, w0, widths):
     f_max: int , default = 50
         Maximum frequency for transformation
     wl: str, default = 'morlet'
-        Wavelet to use, ex: 'morlet', 'ricker'
+        Wavelet to use, Obspy, Scipy, and Pywt wavelets. Use list_wavelets() to see options.
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
     widths: array_like, default = None
@@ -233,8 +233,8 @@ def parameter_calc(wl, dt, f_min, f_max, nf, w0, widths):
         Minimum frequency for transformation
     f_max: int , default = 50
         Maximum frequency for transformation
-    wl: str, default = morlet
-        Wavelet to use, ex: 'morlet', 'ricker' ,'morlet_s', 'morl', 'mexh' ...
+    wl: str, default = 'morlet'
+        Wavelet to use, Obspy, Scipy, and Pywt wavelets. Use list_wavelets() to see options.
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
     widths: array_like, default = None
