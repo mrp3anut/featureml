@@ -5,9 +5,12 @@ from obspy.signal.tf_misfit import cwt as obspycwt
 
 
 
-def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=None, widths=None, use_widths=False):
+def featurize_cwt(data, dt, nf=None, f_min=None, f_max=None, wl='morlet', w0=None, widths=None):
     """
-    Applies CWT to data and then adds the result to the original data
+    Applies CWT to data and then adds the result to the original data.
+    There are two options for CWT:
+    1- Frequency limits: define f_min, f_max and nf ---> wavelets: Morlets and Mexh
+    2- Widths: define widths, do not define f_min, f_max and nf ---> wavelets: All of them.
     
     Parameters
     ------
@@ -18,18 +21,18 @@ def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=None, width
         Sample distance in seconds
     nf: int
         Number of logarithmically spaced frequencies between fmin and fmax
-    f_min: int, default = 1
+    f_min: int, default = None
         Minimum frequency for transformation
-    f_max: int, default = 50
+    f_max: int, default = None
         Maximum frequency for transformation
     wl: str, default = morlet
         Wavelet to use, ex: 'morlet', 'ricker'
     w0: int, default = None
         Parameter for the wavelet, tradeoff between time and frequency resolution
     widths: array_like, default = None
-        The wavelet scales to use. For using this parameter, use_widths must be True. Wavelets other than morlet
+        The wavelet scales to use. Wavelets other than morlet
         and mexh needs widths parameter.
-    use_widths:boolean, default = False
+      
         Optional choice to use widths instead of frequency limits.
         
     Returns
@@ -44,9 +47,12 @@ def featurize_cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=None, width
     
     
 
-def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=None, widths=None, use_widths=False):
+def cwt(data, dt, nf=None, f_min=None, f_max=None, wl='morlet', w0=None, widths=None):
     """
     Continous Wavelet Transform with 1D and 2D data 
+    There are two options for CWT:
+    1- Frequency limits: define f_min, f_max and nf ---> wavelets: Morlets and Mexh
+    2- Widths: define widths, do not define f_min, f_max and nf ---> wavelets: All of them.
     
     Parameters
     ------
@@ -57,19 +63,19 @@ def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=None, widths=None, us
         Sample distance in seconds
     nf: int
         Number of logarithmically spaced frequencies between fmin and fmax
-    f_min: int, default = 1
+    f_min: int, default = None
         Minimum frequency for transformation
-    f_max: int , default = 50
+    f_max: int , default = None
         Maximum frequency for transformation
     wl: str, default = morlet
         Wavelet to use, ex: 'morlet', 'ricker'
     w0: int, default = None
         Parameter for the wavelet, tradeoff between time and frequency resolution
     widths: array_like, default = None
-        The wavelet scales to use. For using this parameter, use_widths must be True. Wavelets other than morlet
+        The wavelet scales to use. Wavelets other than morlet
         and mexh needs widths parameter.
-    use_widths:boolean, default = False
-        Optional choice to use widths instead of frequency limits.
+      
+        
     
     Returns
     -------
@@ -80,7 +86,7 @@ def cwt(data, dt, nf=1, f_min=1, f_max=50, wl='morlet', w0=None, widths=None, us
     """
     
     data = _shaper(data)
-    params = parameter_calc(wl=wl, dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0, widths=widths, use_widths=use_widths)
+    params = parameter_calc(wl=wl, dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0, widths=widths)
     num_channels = data.shape[1] 
     cwt_ = wavelet_cwt(wl)
     if cwt_ == pywt.cwt:
@@ -169,7 +175,7 @@ def wavelet_cwt(wl):
 
 
     
-def _widths_calc(dt, f_min, f_max, nf, wl, w0, widths, use_widths):
+def _widths_calc(dt, f_min, f_max, nf, wl, w0, widths):
     """
     Widths calculator for morlet and ricker wavelet 
     
@@ -188,16 +194,14 @@ def _widths_calc(dt, f_min, f_max, nf, wl, w0, widths, use_widths):
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
     widths: array_like, default = None
-        The wavelet scales to use. For using this parameter, use_widths must be True. Wavelets other than morlet
+        The wavelet scales to use. For using this parameter. Wavelets other than morlet
         and mexh needs widths parameter.
-    use_widths:boolean, default = False
-        Optional choice to use widths instead of frequency limits.
     
     Returns
     -------
     Widths to use
     """
-    if not use_widths:
+    if widths is None:
     
         sampling_freq = 1/dt
         freq = np.logspace(np.log10(f_min), np.log10(f_max), nf)
@@ -207,11 +211,14 @@ def _widths_calc(dt, f_min, f_max, nf, wl, w0, widths, use_widths):
         elif wl in ['morl', 'morlet_s']:
             widths = w0*sampling_freq / (2*freq*np.pi)
     
+    else:
+        assert f_min==None and f_max==None and nf==None
+    
     return widths
 
 
 
-def parameter_calc(wl, dt, f_min, f_max, nf, w0, widths, use_widths):
+def parameter_calc(wl, dt, f_min, f_max, nf, w0, widths):
     """
     Parameter Calculator for different wavelet functions
     
@@ -230,10 +237,9 @@ def parameter_calc(wl, dt, f_min, f_max, nf, w0, widths, use_widths):
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
     widths: array_like, default = None
-        The wavelet scales to use. For using this parameter, use_widths must be True. Wavelets other than morlet
+        The wavelet scales to use. For using this parameter,   must be True. Wavelets other than morlet
         and mexh needs widths parameter.
-    use_widths:boolean, default = False
-        Optional choice to use widths instead of frequency limits.
+     
     
     Returns
     -------
@@ -241,22 +247,22 @@ def parameter_calc(wl, dt, f_min, f_max, nf, w0, widths, use_widths):
     """
     if wl == 'ricker':									# Scipy				
         assert w0 == None
-        widths = _widths_calc(dt=dt, f_min=f_min, f_max=f_max, nf=nf, wl=wl, w0=w0, widths=widths, use_widths=use_widths)
+        widths = _widths_calc(dt=dt, f_min=f_min, f_max=f_max, nf=nf, wl=wl, w0=w0, widths=widths)
         params = {'wavelet':sp.signal.ricker,'widths':widths}
     elif wl == 'mexh':									# Pywt
         assert w0 == None
-        scales = _widths_calc(dt=dt, f_min=f_min, f_max=f_max, nf=nf, wl=wl, w0=w0, widths=widths, use_widths=use_widths)
+        scales = _widths_calc(dt=dt, f_min=f_min, f_max=f_max, nf=nf, wl=wl, w0=w0, widths=widths)
         params = {'scales':widths, 'wavelet':wl}
     elif wl == 'morlet_s':								# Scipy			
-        widths = _widths_calc(dt=dt, f_min=f_min, f_max=f_max, nf=nf, wl=wl, w0=w0, widths=widths, use_widths=use_widths)
+        widths = _widths_calc(dt=dt, f_min=f_min, f_max=f_max, nf=nf, wl=wl, w0=w0, widths=widths)
         params = {'wavelet':sp.signal.morlet2,'widths':widths,'w':w0}
     elif wl =='morlet':								# Obspy
         params = {'dt':dt, 'w0':w0, 'fmin':f_min, 'fmax':f_max, 'nf':nf}
     elif wl == 'morl':
-        widths = _widths_calc(dt=dt, f_min=f_min, f_max=f_max, nf=nf, wl=wl, w0=w0, widths=widths, use_widths=use_widths)
+        widths = _widths_calc(dt=dt, f_min=f_min, f_max=f_max, nf=nf, wl=wl, w0=w0, widths=widths)
         params = {'scales':widths, 'wavelet':wl}
     else:
-        if not use_widths:
+        if not widths==None:
             raise ValueError('This wavelet can be used with widths')
         params = {'scales':widths, 'wavelet':wl}					# Pywt
     return params
