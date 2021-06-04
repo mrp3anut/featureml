@@ -37,7 +37,8 @@ def featurize_cwt(data, dt, nf=None, f_min=None, f_max=None, wl='morlet', w0=Non
         
     Returns
     -------
-    Extended data with CWT, with shape = (len(data, num_channels + num_channels*nf))  
+    Extended data with CWT, with shape = (len(data, num_channels + num_channels*nf)) if used frequency option.
+     with widths option nf is replaced by len(widths). 
     """ 
 
     cwt_data = cwt(data=data, dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0, wl=wl)
@@ -79,7 +80,8 @@ def cwt(data, dt, nf=None, f_min=None, f_max=None, wl='morlet', w0=None, widths=
     
     Returns
     -------
-    Continous wavelet transform applied data shape= (len(data), num_channels*nf)  
+    Continous wavelet transform applied data shape= (len(data), num_channels*nf)  if used frequency option.
+     with widths option nf is replaced by len(widths).
     
     
     num_channels: Number of channels that data contains
@@ -108,7 +110,8 @@ def add_ch(data, m_cwt):
            Continous wavelet transform of the data
     Returns
     -------
-    2D array data = (len(data), ch*(1+nf))
+    2D array data = (len(data), ch*(1+nf)) if used frequency option.
+     with widths option nf is replaced by len(widths).
     """
     data = _shaper(data)
     ext_data = np.concatenate((data, m_cwt), axis=1)
@@ -168,9 +171,7 @@ def wavelet_cwt(wl):
         
     else:
         cwt_ = pywt.cwt         # All pywt wavelets can be seen with 
-        			 # print_wavelets() function from utils, for now we know that morlet, 
-        			 # complex morlet, and mexh(ricker) families are okay with our code
-        			 # we do not recommend using other families for now. 
+        			 # print_wavelets() function from utils.
     return cwt_
 
 
@@ -199,7 +200,7 @@ def _widths_calc(dt, f_min, f_max, nf, wl, w0, widths):
     
     Returns
     -------
-    Widths to use
+    Widths to use in transformation
     """
     if widths is None:
     
@@ -237,13 +238,13 @@ def parameter_calc(wl, dt, f_min, f_max, nf, w0, widths):
     w0: int, default = 5
         parameter for the wavelet, tradeoff between time and frequency resolution
     widths: array_like, default = None
-        The wavelet scales to use. For using this parameter,   must be True. Wavelets other than morlet
+        The wavelet scales to use. Wavelets other than morlet
         and mexh needs widths parameter.
      
     
     Returns
     -------
-    Parameters as list : params
+    Parameters as dictionary : params
     """
     if wl == 'ricker':									# Scipy				
         assert w0 == None
@@ -260,7 +261,7 @@ def parameter_calc(wl, dt, f_min, f_max, nf, w0, widths):
         params = {'dt':dt, 'w0':w0, 'fmin':f_min, 'fmax':f_max, 'nf':nf}
     elif wl == 'morl':
         widths = _widths_calc(dt=dt, f_min=f_min, f_max=f_max, nf=nf, wl=wl, w0=w0, widths=widths)
-        params = {'scales':widths, 'wavelet':wl}
+        params = {'scales':widths, 'wavelet':wl}					# Pywt
     else:
         if not widths==None:
             raise ValueError('This wavelet can be used with widths')
