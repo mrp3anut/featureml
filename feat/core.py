@@ -263,7 +263,7 @@ def parameter_calc(wl, dt, f_min, f_max, nf, w0, widths):
         widths = _widths_calc(dt=dt, f_min=f_min, f_max=f_max, nf=nf, wl=wl, w0=w0, widths=widths)
         params = {'scales':widths, 'wavelet':wl}					# Pywt
     else:
-        if not widths==None:
+        if widths is None:
             raise ValueError('This wavelet can be used with widths')
         params = {'scales':widths, 'wavelet':wl}					# Pywt
     return params
