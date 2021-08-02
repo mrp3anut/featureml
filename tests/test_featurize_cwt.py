@@ -61,8 +61,8 @@ def test_complex_linearity(tol=1e-7):
     								     # The transforms of the real and imaginary components
 
 
-# This function tests the extended data, since extended data is data with cwt transform, one part of the data must be equal to it self
-# and other part must be equal to the cwt of the data 
+# This function tests the extended data, since extended data is data with cwt transform, 
+# one part of the data must be equal to it self and other part must be equal to the cwt of the data 
 def test_featurize_extend(tol=1e-7):
     time, sst = pywt.data.nino()  
    
