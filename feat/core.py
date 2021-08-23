@@ -38,7 +38,7 @@ def featurize_cwt(data, dt, nf=None, f_min=None, f_max=None, wl='morlet', w0=Non
         
     Returns
     -------
-    Extended data with CWT, with shape = (len(data, num_channels + num_channels*nf)) if used frequency option.
+    Extended data with CWT, with shape = (num_samples, num_channels + num_channels*nf) if used frequency option.
      with widths option nf is replaced by len(widths). 
     """ 
 
@@ -90,16 +90,21 @@ def cwt(data, dt, nf=None, f_min=None, f_max=None, wl='morlet', w0=None, widths=
     
     data = _shaper(data)
     params = calc_parameter(wl=wl, dt=dt, f_min=f_min, f_max=f_max, nf=nf, w0=w0, widths=widths)
-    num_channels = data.shape[1] 
+    num_samples, num_channels = data.shape
     cwt_ = get_cwt_fn(wl)
     if wl not in ['morlet', 'morlet_s', 'ricker']:
-        cwts = np.vstack([cwt_(data = data[:, ch], **params)[0] for ch in range(num_channels)])  
+        cwts = np.vstack([cwt_(data = _reflect_stitch(data[:, ch]), **params)[0] for ch in range(num_channels)])  
         # Here we seperate pywt wavelet functions from others. Because pywt.cwt function gives two outputs
         # (transformed_data, frequencies). We only need transformed_data, so we took only the first element 
         # of the output.
     else:
-        cwts = np.vstack([cwt_(data[:, ch], **params) for ch in range(num_channels)])  
+        cwts = np.vstack([cwt_(_reflect_stitch(data[:, ch]), **params) for ch in range(num_channels)])  
+        # to avoid edge effects in cwt, we extend the data with mirror images of itself on both sides,
+        # apply cwt, and then cut to obtain the middle portion
+
    
+    cwts = cwts[:,num_samples:2*num_samples ]
+    
     return cwts.T
 
 
@@ -216,7 +221,7 @@ def _calc_widths(dt, f_min, f_max, nf, wl, w0, widths):
         sampling_freq = 1/dt
         freq = np.logspace(np.log10(f_min), np.log10(f_max), nf)
         if wl in ['ricker','mexh']:
-            widths = 1/(4*freq)
+            widths = 1/(4*freq*sampling_freq)
 
         elif wl in ['morl', 'morlet_s']:                         # Morlet wavelet has a 'widths' function that is 
             widths = w0*sampling_freq / (2*freq*np.pi)           # calculated using frequencies, sampling_frequency
@@ -289,3 +294,11 @@ def _check_args(widths, f_min, f_max, nf):
         assert (f_min is not None) and (f_max is not None) and (nf is not None)
     else:
         assert (f_min is None) and (f_max is None) and (nf is None)
+
+def _reflect_stitch(data):
+    num_samples = data.shape[0]
+    data_ = np.empty(shape=(num_samples*3,) )
+    data_[:num_samples] = np.flip(data)
+    data_[num_samples:2*num_samples] = data
+    data_[num_samples*2:] = np.flip(data)
+    return data_
